@@ -52,7 +52,7 @@ pytestmark_db = pytest.mark.skipif(not _db_available(), reason="PostgreSQL 접�
 def temp_schema(monkeypatch):
     schema = f"raw_test_{uuid.uuid4().hex[:8]}"
     with psycopg.connect("", autocommit=True) as conn:
-        conn.execute(DDL.read_text().replace("raw.", f"{schema}.")
+        conn.execute(DDL.read_text(encoding="utf-8").replace("raw.", f"{schema}.")
                      .replace("CREATE SCHEMA IF NOT EXISTS raw;", f"CREATE SCHEMA {schema};"))
     monkeypatch.setattr(lr, "RAW_SCHEMA", schema)
     yield schema
@@ -87,8 +87,8 @@ def test_bad_file_keeps_previous_data(temp_schema, small_data):
 
     # 원천에 컬럼이 추가된 상황(스키마 드리프트) 재현
     bad = small_data / lr.TABLE_FILES["sellers"]
-    rows = bad.read_text().splitlines()
-    bad.write_text("\n".join([rows[0] + ",new_col"] + [r + ",x" for r in rows[1:]]) + "\n")
+    rows = bad.read_text(encoding="utf-8").splitlines()
+    bad.write_text("\n".join([rows[0] + ",new_col"] + [r + ",x" for r in rows[1:]]) + "\n", encoding="utf-8")
 
     with pytest.raises(RuntimeError):
         lr.run(small_data, ["sellers"])
