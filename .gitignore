@@ -1,0 +1,7 @@
+# 원천 데이터는 커밋하지 않는다 (scripts/download_data.sh로 재현)
+data/raw/*.csv
+.env
+__pycache__/
+.pytest_cache/
+*.pyc
+.venv/
